@@ -2,15 +2,26 @@
  * @file io.c
  * @author Stack1
  * @brief
- * @version 1.0
+ * @version 0.1
  * @date 31-01-2025
  *
- * Copyright (c) Simone Staccone
+ * Copyright (c) Simone Staccone, Tor Vergata University, Rome
  *
  */
 #include "io.h"
 
-void _write_seq_file()
+void _random_generate(int *sequence, int size)
+{
+    int i;
+    srand(time(NULL)); // Initialization, should only be called once.
+
+    for (i = 0; i < size; i++)
+    {
+        sequence[i] = (int)(rand() % 100);
+    }
+}
+
+void _write_seq_file(int *sequence)
 {
     int ret, i;
     FILE *fp;
@@ -21,16 +32,12 @@ void _write_seq_file()
     {
         if (errno != ENOENT)
         {
-            fprintf(stdout, RED "\tUnexpected error returned while opening the file %s\n" RESET, DEFAULT_SEQ_FILE_NAME);
-            fprintf(stdout, RED "\tErrno returned %s\n" RESET, strerror(errno));
+            fprintf(stdout, RED "\tUnexpected error returned while opening the file %s" RESET "\n", DEFAULT_SEQ_FILE_NAME);
+            fprintf(stdout, RED "\tErrno returned %s" RESET "\n", strerror(errno));
             fclose(fp);
             exit(EXIT_FAILURE);
         }
-        fprintf(stdout, "\tCreating sequence.txt file\t\t" GREEN "[OK]" RESET "\n");
-    }
-    else
-    {
-        fprintf(stdout, "\tOpening sequence.txt file\t\t" GREEN "[OK]" RESET "\n");
+        fprintf(stdout, "\tCreate file sequence.txt\t\t" GREEN "[OK]" RESET "\n");
     }
 
     fp = fopen(DEFAULT_SEQ_FILE_NAME, "w");
@@ -38,30 +45,34 @@ void _write_seq_file()
     {
         if (errno == EINVAL)
         {
-            fprintf(stdout, RED "\tInvalid mode flags used to open the file %s\n" RESET, DEFAULT_SEQ_FILE_NAME);
-            fprintf(stdout, RED "\tErrno returned %s\n" RESET, strerror(errno));
+            fprintf(stdout, RED "\tInvalid mode flags used to open the file %s" RESET "\n", DEFAULT_SEQ_FILE_NAME);
+            fprintf(stdout, RED "\tErrno returned %s" RESET "\n", strerror(errno));
             fclose(fp);
             exit(EXIT_FAILURE);
         }
         else if (errno == ENOENT)
         {
-            fprintf(stdout, RED "\tDirectory or file %s does not exist\n" RESET, DEFAULT_SEQ_FILE_NAME);
-            fprintf(stdout, RED "\tErrno returned %s\n" RESET, strerror(errno));
+            fprintf(stdout, RED "\tDirectory or file %s does not exist" RESET "\n", DEFAULT_SEQ_FILE_NAME);
+            fprintf(stdout, RED "\tErrno returned %s" RESET "\n", strerror(errno));
             fclose(fp);
             exit(EXIT_FAILURE);
         }
         else
         {
-            fprintf(stdout, RED "\tUnexpected error returned while opening the file %s\n" RESET, DEFAULT_SEQ_FILE_NAME);
-            fprintf(stdout, RED "\tErrno returned %s\n" RESET, strerror(errno));
+            fprintf(stdout, RED "\tUnexpected error returned while opening the file %s" RESET "\n", DEFAULT_SEQ_FILE_NAME);
+            fprintf(stdout, RED "\tErrno returned %s" RESET "\n", strerror(errno));
             fclose(fp);
             exit(EXIT_FAILURE);
         }
     }
 
-    for (i = 0; i < BUFF_SIZE * 3; i++)
+    fprintf(stdout, "\tOpen file sequence.txt\t\t\t" GREEN "[OK]" RESET "\n");
+
+    _random_generate(sequence, BUFF_SIZE);
+
+    for (i = 0; i < BUFF_SIZE; i++)
     {
-        ret = fprintf(fp, "%d", i);
+        ret = fprintf(fp, "%d", sequence[i]);
         if (ret == 0)
         {
             break;
@@ -69,22 +80,22 @@ void _write_seq_file()
 
         if (ret == -1)
         {
-            fprintf(stdout, "\tElements written on file: %d\t\t" GREEN "[FAIL]" RESET "\n",i);
-            fprintf(stdout, RED "\t\"write_seq_file\": Error writing number %d on file %s\n" RESET, i, DEFAULT_SEQ_FILE_NAME);
+            fprintf(stdout, "\tElements written on file: %d\t\t" GREEN "[FAIL]" RESET "\n", i);
+            fprintf(stdout, RED "\t\"write_seq_file\": Error writing number %d on file %s" RESET "\n", i, DEFAULT_SEQ_FILE_NAME);
             exit(EXIT_FAILURE);
         }
         ret = fwrite(blank, sizeof(char), 1, fp);
         if (ret == -1)
         {
-            fprintf(stdout, "\tElements written on file: %d\t\t" GREEN "[FAIL]" RESET "\n",i);
-            fprintf(stdout, RED "\t\"write_seq_file\": Error writing blank space after number %d on file %s\n" RESET, i, DEFAULT_SEQ_FILE_NAME);
+            fprintf(stdout, "\tElements written on file: %d\t\t" GREEN "[FAIL]" RESET "\n", i);
+            fprintf(stdout, RED "\t\"write_seq_file\": Error writing blank space after number %d on file %s" RESET "\n", i, DEFAULT_SEQ_FILE_NAME);
             exit(EXIT_FAILURE);
         }
     }
 
     fclose(fp);
 
-    fprintf(stdout, "\tElements written on file: %d\t\t" GREEN "[OK]" RESET "\n",i);
+    fprintf(stdout, "\tElements written on file: %d\t\t" GREEN "[OK]" RESET "\n", i);
 }
 
 /**
@@ -92,26 +103,35 @@ void _write_seq_file()
  *
  * @param file_name The string representing the name of the file to open
  * (or NULL if the file is the standard config/sequence.txt file)
- * @return A pointer to a memory area containing the sequence.
+ * @return The size of the sequence read from file.
  */
-int *seq_file_read(char *file_name)
+int seq_file_read(sequence *seq, char *file_name)
 {
     int ret, i, max_size, resized;
     FILE *fp;
-    int *sequence;
     int *tmp;
     char local_file_name[256];
 
     max_size = 0; // Counter used to see if realloc needed
     resized = 0;  // Variable holding the information about how many times the vector has been resized
 
+    fprintf(stdout, "[INFO]\tReading sequence from file ...\n");
+
+    seq->data = (int *)malloc(sizeof(int) * BUFF_SIZE);
+    if (seq->data == NULL)
+    {
+        fprintf(stdout, "\tInitialize memory\t\t\t" GREEN "[FAIL]" RESET "\n");
+        fprintf(stdout, RED "\tError allocating memory for sequence array in function \"seq_file_read\" \n");
+        exit(EXIT_FAILURE);
+    }
+
+    fprintf(stdout, "\tInitialize memory\t\t\t" GREEN "[OK]" RESET "\n");
+
     if (file_name == NULL)
     {
-        fprintf(stdout, "[INFO]\tReading sequence from standard file sequence.txt\n");
         strncpy(local_file_name, DEFAULT_SEQ_FILE_NAME, (strlen(DEFAULT_SEQ_FILE_NAME) + 1) * sizeof(char));
-        fprintf(stdout, "[INFO]\tGenerating sequence ...\n");
-        _write_seq_file();
-        fprintf(stdout, GREEN "\tSequence successfully generated and written on file!\n" RESET);
+        _write_seq_file(seq->data);
+        fprintf(stdout, GREEN "\tSequence successfully generated and written on file!" RESET "\n");
     }
     else
     {
@@ -123,67 +143,65 @@ int *seq_file_read(char *file_name)
             sprintf(local_file_name, "%s%s", DEFAULT_SUFFIX_DIR, file_name);
         }
     }
-    printf("%s\n",local_file_name);
-
-    sequence = (int *)malloc(sizeof(int) * BUFF_SIZE);
-    if (sequence == NULL)
-    {
-        fprintf(stdout, RED "\tError allocating memory for sequence array in function \"seq_file_read\" \n");
-        exit(EXIT_FAILURE);
-    }
-    fprintf(stdout, "\tMemory correctly initialized for sequence\n");
 
     fp = fopen(local_file_name, "r");
     if (fp == NULL)
     {
-        fprintf(stdout, "\tFile %s open \t\t\t" RED "[FAIL]" RESET "\n", local_file_name);
+        fprintf(stdout, "\tFile %s open \t\t" RED "[FAIL]" RESET "\n", local_file_name);
 
         if (errno == EINVAL)
         {
-            fprintf(stdout, RED "\tInvalid mode flags used to open the file %s\n" RESET, local_file_name);
+            fprintf(stdout, RED "\tInvalid mode flags used to open the file %s" RESET "\n", local_file_name);
         }
         else if (errno == ENOENT)
         {
-            fprintf(stdout, RED "\tDirectory or file %s does not exist\n" RESET, local_file_name);
+            fprintf(stdout, RED "\tDirectory or file %s does not exist" RESET "\n", local_file_name);
         }
         else
         {
-            fprintf(stdout, RED "\tUnexpected error returned while opening the file %s\n" RESET, local_file_name);
+            fprintf(stdout, RED "\tUnexpected error returned while opening the file %s" RESET "\n", local_file_name);
         }
 
-        fprintf(stdout, RED "\tErrno returned %s\n" RESET, strerror(errno));
+        fprintf(stdout, RED "\tErrno returned %s" RESET "\n", strerror(errno));
 
-        fclose(fp);
         exit(EXIT_FAILURE);
     }
 
-    fprintf(stdout, "\tFile %s open \t\t\t" GREEN "[OK]" RESET "\n", local_file_name);
+    fprintf(stdout, "[INFO]\tLoading data from file ...\n");
+    fprintf(stdout, "\tFile %s open \t" GREEN "[OK]" RESET "\n", local_file_name);
 
     ret = 1;
     i = 0;
 
     while (ret != 0)
     {
-        ret = fscanf(fp, "%d", &sequence[i]);
-        if (ret == -1)
+        ret = fscanf(fp, "%d", &seq->data[i]);
+        if (ret == EOF)
         {
-            return NULL;
+            if (errno == 0)
+            {
+                break;
+            }
+            fprintf(stdout, RED "\tError loading data from file %s" RESET "\n", local_file_name);
+            fprintf(stdout, RED "\tErrno returned %d: %s" RESET "\n", errno, strerror(errno));
+            return -1;
         }
         max_size++;
         if (max_size == BUFF_SIZE)
         {
             resized++;
-            tmp = (int *)realloc(sequence, sizeof(int) * BUFF_SIZE * (resized + 1));
+            tmp = (int *)realloc(seq->data, sizeof(int) * BUFF_SIZE * (resized + 1));
 
             if (tmp == NULL)
             {
-                fprintf(stdout, YELLOW "\tWarning: Impossible to read thw whole .txt file, it's either too large or memory is not available at this time. Read %d elements.\n" RESET, i + 1);
-                fprintf(stdout, RED "\tError resizing memory! The resize index is %d. The function called was \"seq_file_read\" \n" RESET, i + 1);
-                return sequence;
+                fprintf(stdout, YELLOW "\tWarning: Impossible to read thw whole .txt file, it's either too large or memory is not available at this time. Read %d elements." RESET "\n", i + 1);
+                fprintf(stdout, RED "\tError resizing memory! The resize index is %d. The function called was \"seq_file_read\" " RESET "\n", i + 1);
+                seq->size = i + 1;
+                break;
             }
             else
             {
-                sequence = tmp; // Realloc OK, save new pointer value
+                seq->data = tmp; // Realloc OK, save new pointer value
             }
 
             max_size = 0;
@@ -194,5 +212,11 @@ int *seq_file_read(char *file_name)
 
     fclose(fp);
 
-    return sequence;
+    fprintf(stdout, "\tLoad sequence of size %d\t\t" GREEN "[OK]" RESET "\n", i + 1);
+
+    seq->size = i + 1;
+
+    fprintf(stdout, GREEN "\tSequence successfully loaded into memory" RESET "\n");
+
+    return 0;
 }

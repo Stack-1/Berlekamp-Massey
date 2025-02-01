@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 
 #define DEFAULT_SEQ_FILE_NAME "../config/sequence.txt"
 #define DEFAULT_SUFFIX_DIR "../config/" 
@@ -37,6 +38,12 @@
 #define BOLDCYAN    "\033[1m\033[36m"       /* Bold Cyan    */
 #define BOLDWHITE   "\033[1m\033[37m"       /* Bold White   */
 
-int *seq_file_read(char *file_name);
+typedef struct sequence{
+    int size;
+    int *data;
+}sequence;
+
+int seq_file_read(sequence *seq, char *file_name);
+
 
 #endif
