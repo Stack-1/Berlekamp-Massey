@@ -176,17 +176,21 @@ int seq_file_read(sequence *seq, char *file_name)
     while (ret != 0)
     {
         ret = fscanf(fp, "%d", &seq->data[i]);
+                
         if (ret == EOF)
         {
             if (errno == 0)
             {
+                i--; // Resize to correct length the final vector
                 break;
             }
             fprintf(stdout, RED "\tError loading data from file %s" RESET "\n", local_file_name);
             fprintf(stdout, RED "\tErrno returned %d: %s" RESET "\n", errno, strerror(errno));
             return -1;
         }
+
         max_size++;
+        
         if (max_size == BUFF_SIZE)
         {
             resized++;

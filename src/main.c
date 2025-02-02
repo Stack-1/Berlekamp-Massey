@@ -2,7 +2,7 @@
 
 
 int main(int argc, char **argv){
-    int ret;
+    int i, ret;
     char *file_name;
     sequence *seq;
 
@@ -14,7 +14,7 @@ int main(int argc, char **argv){
 
     seq = (sequence *)malloc(sizeof(sequence));
     if(seq == NULL){
-        // TDO: Handle error
+        // TODO: Handle error
     }
 
     
@@ -40,6 +40,7 @@ int main(int argc, char **argv){
         exit(EXIT_FAILURE);
     }
 
+    berlekamp_massey(seq);
 
     return 0;
 }
