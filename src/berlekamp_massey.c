@@ -156,7 +156,7 @@ void berlekamp_massey(polynomial *s)
         }
     }
 
-    _print_poly(c);
+    // _print_poly(c);
 
     // for (i = 0; i < s->size; i++)
     // {
