@@ -16,7 +16,7 @@
 #include <errno.h>
 #include <time.h>
 
-#define DEFAULT_SEQ_FILE_NAME "../config/sequence.txt"
+#define DEFAULT_SEQ_FILE_NAME "../config/polynomial.txt"
 #define DEFAULT_SUFFIX_DIR "../config/" 
 #define BUFF_SIZE 1024 //This is the size of the buffer used to read numbers from file, it is dynamically reallocated only after max size is reached to avoid continuos malloc calls 
 
@@ -38,12 +38,13 @@
 #define BOLDCYAN    "\033[1m\033[36m"       /* Bold Cyan    */
 #define BOLDWHITE   "\033[1m\033[37m"       /* Bold White   */
 
-typedef struct sequence{
+typedef struct polynomial{
     int size;
+    int mem_size;
     int *data;
-}sequence;
+}polynomial;
 
-int seq_file_read(sequence *seq, char *file_name);
+int seq_file_read(polynomial *seq, char *file_name);
 
 
 #endif

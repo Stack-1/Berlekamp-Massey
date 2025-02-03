@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -O3 -Wall -Wextra -Werror
-SRCS = main.c io/io.c
+CFLAGS = -O3 
+SRCS = main.c io/io.c berlekamp_massey.c
 
 
 all:

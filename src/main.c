@@ -1,20 +1,22 @@
 #include "io/io.h"
+#include "berlekamp_massey.h"
 
 
 int main(int argc, char **argv){
-    int i, ret;
+    int ret;
     char *file_name;
-    sequence *seq;
+    polynomial *s;
 
     printf("[INFO]\tBerlekamp-Massey algorithm for linear recurrences\n");
     printf("\tVersion 0.1\n");
-    printf("\tCopyright (c) 2025 Simone Staccone, Tor Vergata University, Rome\n");
+    printf("\tCopyright (s) 2025 Simone Staccone, Tor Vergata University, Rome\n");
     printf("\tAuthor: Stack1\n");
     puts("");
 
-    seq = (sequence *)malloc(sizeof(sequence));
-    if(seq == NULL){
-        // TODO: Handle error
+    s = (polynomial *)malloc(sizeof(polynomial));
+    if(s == NULL){
+        fprintf(stdout, RED "[ERROR]\tError allocating memory for C polynomial data structure" RESET "\n");
+        exit(EXIT_FAILURE);
     }
 
     
@@ -34,13 +36,13 @@ int main(int argc, char **argv){
             break;
     }
 
-    ret = seq_file_read(seq,file_name);
+    ret = seq_file_read(s,file_name);
     if(ret != 0){
-        fprintf(stdout,RED "[ERROR] Error encountered while leading sequence elements\n" RESET);
+        fprintf(stdout,RED "[ERROR] Error encountered while leading polynomial elements\n" RESET);
         exit(EXIT_FAILURE);
     }
 
-    berlekamp_massey(seq);
+    berlekamp_massey(s);
 
     return 0;
 }

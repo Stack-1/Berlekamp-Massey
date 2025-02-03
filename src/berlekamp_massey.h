@@ -3,5 +3,6 @@
 
 #include "io/io.h"
 
+void berlekamp_massey(polynomial *s);
 
 #endif
