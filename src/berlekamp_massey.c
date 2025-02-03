@@ -137,7 +137,7 @@ void berlekamp_massey(polynomial *s)
 
     start_index = _set_start(s);
 
-    printf("Start index: %d\n", start_index);
+    // printf("Start index: %d\n", start_index);
 
     // Initialize C polynomial with the right length init status
     if (start_index == 0)
