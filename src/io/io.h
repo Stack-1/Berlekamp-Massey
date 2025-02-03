@@ -16,7 +16,7 @@
 #include <errno.h>
 #include <time.h>
 
-#define DEFAULT_SEQ_FILE_NAME "../config/polynomial.txt"
+#define DEFAULT_SEQ_FILE_NAME "../config/sequence.txt"
 #define DEFAULT_SUFFIX_DIR "../config/" 
 #define BUFF_SIZE 1024 //This is the size of the buffer used to read numbers from file, it is dynamically reallocated only after max size is reached to avoid continuos malloc calls 
 
