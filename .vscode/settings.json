@@ -3,5 +3,8 @@
         "Berlekamp",
         "Staccone",
         "Vergata"
-    ]
+    ],
+    "files.associations": {
+        "berlekamp_massey.h": "c"
+    }
 }

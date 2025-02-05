@@ -10,18 +10,18 @@
  */
 #include "io.h"
 
-void _random_generate(int *polynomial, int size)
+void _random_generate(float *polynomial, int size)
 {
     int i;
     srand(time(NULL)); // Initialization, should only be called once.
 
     for (i = 0; i < size; i++)
     {
-        polynomial[i] = (int)(rand() % 100);
+        polynomial[i] = (float)(rand() % 100);
     }
 }
 
-void _write_seq_file(int *polynomial)
+void _write_seq_file(float *polynomial)
 {
     int ret, i;
     FILE *fp;
@@ -68,7 +68,7 @@ void _write_seq_file(int *polynomial)
 
     for (i = 0; i < BUFF_SIZE; i++)
     {
-        ret = fprintf(fp, "%d", polynomial[i]);
+        ret = fprintf(fp, "%f", polynomial[i]);
         if (ret == 0)
         {
             break;
@@ -105,7 +105,7 @@ int seq_file_read(polynomial *seq, char *file_name)
 {
     int ret, i, max_size, resized;
     FILE *fp;
-    int *tmp;
+    float *tmp;
     char local_file_name[256];
 
     max_size = 0; // Counter used to see if realloc needed
@@ -113,7 +113,7 @@ int seq_file_read(polynomial *seq, char *file_name)
 
     fprintf(stdout, "[INFO]\tReading polynomial from file ...\n");
 
-    seq->data = (int *)malloc(sizeof(int) * BUFF_SIZE);
+    seq->data = (float *)malloc(sizeof(float) * BUFF_SIZE);
     if (seq->data == NULL)
     {
         fprintf(stdout, "\tInitialize memory\t\t\t" GREEN "[FAIL]" RESET "\n");
@@ -159,13 +159,12 @@ int seq_file_read(polynomial *seq, char *file_name)
         }
 
         fprintf(stdout, RED "\tErrno returned %s" RESET "\n", strerror(errno));
-
         exit(EXIT_FAILURE);
     }
 
     fprintf(stdout, "[INFO]\tLoading data from file ...\n");
 
-    if (strlen(local_file_name) <= 19)
+    if (strlen(local_file_name) < 21) // Magic number used to format output in the fastest way (not the best)
     {
         fprintf(stdout, "\tFile %s open \t\t" GREEN "[OK]" RESET "\n", local_file_name);
     }
@@ -179,7 +178,7 @@ int seq_file_read(polynomial *seq, char *file_name)
 
     while (ret != 0)
     {
-        ret = fscanf(fp, "%d", &seq->data[i]);
+        ret = fscanf(fp, "%f", &seq->data[i]);
 
         if (ret == EOF)
         {
@@ -198,7 +197,7 @@ int seq_file_read(polynomial *seq, char *file_name)
         if (max_size == BUFF_SIZE)
         {
             resized++;
-            tmp = (int *)realloc(seq->data, sizeof(int) * BUFF_SIZE * (resized + 1));
+            tmp = (float *)realloc(seq->data, sizeof(float) * BUFF_SIZE * (resized + 1));
 
             if (tmp == NULL)
             {

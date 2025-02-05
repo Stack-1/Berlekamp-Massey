@@ -38,10 +38,14 @@
 #define BOLDCYAN    "\033[1m\033[36m"       /* Bold Cyan    */
 #define BOLDWHITE   "\033[1m\033[37m"       /* Bold White   */
 
+/**
+ * @brief Data structure used for the representation of
+ * a linear polynomial.
+ */
 typedef struct polynomial{
-    int size;
-    int mem_size;
-    int *data;
+    int size;               //! The current size of the polynomial 
+    int mem_size;           //! THe total elements that the data vector can store in memory
+    float *data;              //! The vector containing the coefficients of the polynomial
 }polynomial;
 
 int seq_file_read(polynomial *seq, char *file_name);
