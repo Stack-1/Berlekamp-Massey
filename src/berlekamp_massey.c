@@ -60,7 +60,6 @@ float _evaluate_poly(polynomial *s, polynomial *c, int i)
     for (j = 0; j < c->size; j++)
     {
         val += (c->data[j] * s->data[i - j - 1]);
-        printf("%d %d %.2f %.2f %.2f\n", i, j, val, c->data[j], s->data[i - j - 1]);
     }
 
     return val;
@@ -195,25 +194,17 @@ void berlekamp_massey(polynomial *s)
     b->size = 0;
     b->mem_size = d->mem_size;
 
+    // Find the first index of a non zero element
     start_index = _set_start(s);
 
-    printf("Start index: %d\n", start_index);
-
+    // Initialize C polynomial with the right length init status
     c->data[0] = 1;
     c->size++;
     last_delta = s->data[start_index];
     last_index = start_index;
 
-    // Initialize C polynomial with the right length init status
-    // if (start_index == 0)
-    // {
-    //     // Initialize C with the first element of S(x)
-    //     c->data[0] = 1;
-    //     c->size = 1;
-    //     start_index++;
-    // }
-    // else
-    if(start_index > 0){
+    if (start_index > 0)
+    {
         // Insert a set of zeros
         for (i = 0; i < start_index; i++)
         {
@@ -223,20 +214,26 @@ void berlekamp_massey(polynomial *s)
         last_delta = s->data[i];
     }
 
+#ifdef DEBUG
     printf("Initial B(x): ");
     _print_poly(b);
     printf("Initial D(x): ");
     _print_poly(d);
     printf("Initial C(x): ");
     _print_poly(c);
-
+#endif
     // printf("%d %d\n",c->size, _evaluate_poly(s,c,c->size - 1));
+
+    delta = 1;
 
     for (i = start_index + 1; i < s->size; i++)
     {
-        printf("Iteration %d\n", i);
         delta = _cmp_c_s(s, c, i);
+#ifdef DEBUG
+        printf("Iteration %d\n", i);
         printf("Delta: %.2f\n", delta);
+#endif
+
         if (delta == 0)
         {
             // Linear recurrence matches
@@ -244,30 +241,23 @@ void berlekamp_massey(polynomial *s)
         }
         else
         {
+
             // Step 1: Set d equal to that sequence
             _poly_cpy(d, b);
 
-            _poly_cpy(b, c);
-
-            printf("B(x): ");
-            _print_poly(b);
-            printf("D(x): ");
-            _print_poly(d);
-            printf("C(x): ");
-            _print_poly(c);
-
+#ifdef DEBUG
             printf("Debug 1 D(x): ");
             _print_poly(d);
-
+#endif
             // Step 2: Multiply sequence by -1
             for (j = 0; j < d->size; j++)
             {
                 d->data[j] = -d->data[j];
             }
-
+#ifdef DEBUG
             printf("Debug 2 D(x): ");
             _print_poly(d);
-
+#endif
             // Step 3: Insert 1 on the left
             for (j = d->size; j > 0; j--)
             {
@@ -276,22 +266,23 @@ void berlekamp_massey(polynomial *s)
             d->data[0] = 1.0;
             d->size++;
 
+#ifdef DEBUG
             printf("Debug 3 D(x): ");
             _print_poly(d);
-
+#endif
             // Step 4: Multiply the sequence by delta / d(f + 1)
             val = delta / last_delta;
-            printf("Val: %.2f %.2f %.2f\n", val, delta, last_delta);
             for (j = 0; j < d->size; j++)
             {
                 d->data[j] = d->data[j] * val;
             }
-
+#ifdef DEBUG
             printf("Debug 4 D(x): ");
             _print_poly(d);
-
+#endif
             // Step 5: Insert i - f - 1 zeros on the left
             zeros = i - last_index - 1;
+
             if (zeros != 0)
             {
                 d->size = d->size + zeros;
@@ -300,17 +291,26 @@ void berlekamp_massey(polynomial *s)
                 {
                     d->data[j - 1] = d->data[j - zeros - 1];
                 }
-                printf("Middle D(x):");
+#ifdef DEBUG
+                printf("Middle D(x): ");
                 _print_poly(d);
-
+#endif
                 for (j = 0; j < zeros; j++)
                 {
                     d->data[j] = 0;
                 }
             }
-
+#ifdef DEBUG
             printf("Debug 5 D(x): ");
             _print_poly(d);
+#endif
+
+            if (i - c->size >= last_index - b->size)
+            {
+                _poly_cpy(b, c);
+                last_index = i;
+                last_delta = delta;
+            }
 
             // Step 6: Sum d and c
             val = (c->size > d->size) ? c->size : d->size;
@@ -319,12 +319,22 @@ void berlekamp_massey(polynomial *s)
                 c->data[j] = c->data[j] + d->data[j];
             }
             c->size = val;
-
+#ifdef DEBUG
             printf("Debug 5 C(x): ");
             _print_poly(c);
+#endif
 
-            last_delta = delta;
-            last_index = i;
+#ifdef DEBUG
+            printf("End of %i iteration B(x): ", i);
+            _print_poly(b);
+            printf("End of %i iteration D(x): ", i);
+            _print_poly(d);
+            printf("End of %i iteration C(x): ", i);
+            _print_poly(c);
+#endif
         }
     }
+
+    printf("C(x): ");
+    _print_poly(c);
 }
