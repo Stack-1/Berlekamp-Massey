@@ -21,18 +21,23 @@ void _random_generate(float *polynomial, int size)
     }
 }
 
-void _write_seq_file(float *polynomial)
+void _write_seq_file(float *polynomial, char *file_name)
 {
     int ret, i;
     FILE *fp;
     char *blank = " ";
 
-    fp = fopen(DEFAULT_SEQ_FILE_NAME, "r");
+    if(file_name == NULL){
+        file_name = DEFAULT_SEQ_FILE_NAME;
+    }
+
+
+    fp = fopen(file_name, "r");
     if (fp == NULL)
     {
         if (errno != ENOENT)
         {
-            fprintf(stdout, RED "\tUnexpected error returned while opening the file %s" RESET "\n", DEFAULT_SEQ_FILE_NAME);
+            fprintf(stdout, RED "\tUnexpected error returned while opening the file %s" RESET "\n", file_name);
             fprintf(stdout, RED "\tErrno returned %s" RESET "\n", strerror(errno));
             fclose(fp);
             exit(EXIT_FAILURE);
@@ -40,22 +45,22 @@ void _write_seq_file(float *polynomial)
         fprintf(stdout, "\tCreate file sequence.txt\t\t" GREEN "[OK]" RESET "\n");
     }
 
-    fp = fopen(DEFAULT_SEQ_FILE_NAME, "w");
+    fp = fopen(file_name, "w");
     if (fp == NULL)
     {
         fprintf(stdout, "\tOpen file sequence.txt\t\t\t" RED "[FAIL]" RESET "\n");
 
         if (errno == EINVAL)
         {
-            fprintf(stdout, RED "\tInvalid mode flags used to open the file %s" RESET "\n", DEFAULT_SEQ_FILE_NAME);
+            fprintf(stdout, RED "\tInvalid mode flags used to open the file %s" RESET "\n", file_name);
         }
         else if (errno == ENOENT)
         {
-            fprintf(stdout, RED "\tDirectory or file %s does not exist" RESET "\n", DEFAULT_SEQ_FILE_NAME);
+            fprintf(stdout, RED "\tDirectory or file %s does not exist" RESET "\n", file_name);
         }
         else
         {
-            fprintf(stdout, RED "\tUnexpected error returned while opening the file %s" RESET "\n", DEFAULT_SEQ_FILE_NAME);
+            fprintf(stdout, RED "\tUnexpected error returned while opening the file %s" RESET "\n", file_name);
         }
         fprintf(stdout, RED "\tErrno returned %s" RESET "\n", strerror(errno));
         fclose(fp);
@@ -77,14 +82,14 @@ void _write_seq_file(float *polynomial)
         if (ret == -1)
         {
             fprintf(stdout, "\tElements written on file: %d\t\t" GREEN "[FAIL]" RESET "\n", i);
-            fprintf(stdout, RED "\t\"write_seq_file\": Error writing number %d on file %s" RESET "\n", i, DEFAULT_SEQ_FILE_NAME);
+            fprintf(stdout, RED "\t\"write_seq_file\": Error writing number %d on file %s" RESET "\n", i, file_name);
             exit(EXIT_FAILURE);
         }
         ret = fwrite(blank, sizeof(char), 1, fp);
         if (ret == -1)
         {
             fprintf(stdout, "\tElements written on file: %d\t\t" GREEN "[FAIL]" RESET "\n", i);
-            fprintf(stdout, RED "\t\"write_seq_file\": Error writing blank space after number %d on file %s" RESET "\n", i, DEFAULT_SEQ_FILE_NAME);
+            fprintf(stdout, RED "\t\"write_seq_file\": Error writing blank space after number %d on file %s" RESET "\n", i, file_name);
             exit(EXIT_FAILURE);
         }
     }
@@ -126,7 +131,7 @@ int seq_file_read(polynomial *seq, char *file_name)
     if (file_name == NULL)
     {
         strncpy(local_file_name, DEFAULT_SEQ_FILE_NAME, (strlen(DEFAULT_SEQ_FILE_NAME) + 1) * sizeof(char));
-        _write_seq_file(seq->data);
+        _write_seq_file(seq->data,NULL);
         fprintf(stdout, GREEN "\tSequence successfully generated and written on file!" RESET "\n");
     }
     else

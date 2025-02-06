@@ -90,12 +90,15 @@ int _set_start(polynomial *s)
 }
 
 /**
- * @brief
+ * @brief Function that returns the difference between the polynomial
+ * S(x) evaluated with C(x) at the i-th grade and the value of the
+ * i-th element of the sequence S(x).
  *
- * @param s
- * @param c
- * @param index
- * @return
+ * @param s The data structure containing the sequence to compare.
+ * @param c The data structure containing the polynomial to evaluate.
+ * @param index The grade off the polynomial.
+ * @return A floating point representing the difference between
+ * S(c_0,c_1,...,c_i) and S(i).
  */
 float _cmp_c_s(polynomial *s, polynomial *c, int index)
 {
@@ -130,8 +133,10 @@ void berlekamp_massey(polynomial *s)
     float val, delta, last_delta;
     polynomial *c, *d, *b;
 
+#ifdef DEBUG
     printf("S(x): ");
     _print_poly(s);
+#endif
 
     fprintf(stdout, "[INFO]\tStarting Berlekamp-Massey algorithm ...\n");
 
@@ -184,8 +189,6 @@ void berlekamp_massey(polynomial *s)
         exit(EXIT_FAILURE);
     }
 
-    fprintf(stdout, "\tMemory and metadata initialization \t" GREEN "[OK]" RESET "\n");
-
     // Initialize C polynomial metadata
     c->size = 0;
     c->mem_size = s->mem_size;
@@ -193,6 +196,8 @@ void berlekamp_massey(polynomial *s)
     d->mem_size = c->mem_size;
     b->size = 0;
     b->mem_size = d->mem_size;
+
+    fprintf(stdout, "\tMemory and metadata initialization \t" GREEN "[OK]" RESET "\n");
 
     // Find the first index of a non zero element
     start_index = _set_start(s);
@@ -213,6 +218,8 @@ void berlekamp_massey(polynomial *s)
         }
         last_delta = s->data[i];
     }
+
+    fprintf(stdout, "\tAlgorithm initialization\t\t" GREEN "[OK]" RESET "\n");
 
 #ifdef DEBUG
     printf("Initial B(x): ");
@@ -334,7 +341,16 @@ void berlekamp_massey(polynomial *s)
 #endif
         }
     }
+    fprintf(stdout, "\tAlgorithm termination\t\t\t" GREEN "[OK]" RESET "\n");
 
+#ifdef DEBUG
     printf("C(x): ");
     _print_poly(c);
+#endif
+
+
+    _write_seq_file(s->data,"output.txt");
+
+
+    fprintf(stdout, GREEN "\tLinear recurrence successfully computed!" RESET "\n");
 }
