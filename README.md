@@ -17,7 +17,7 @@ The algorithm has multiple steps and has been proven to work in different papers
 Our reference problem is to find the coefficients $C = [c_1,c_1.c_2,c_3,...,c_d]$ that correctly finds a linear recurrence between the elements of the  sequence $S = [s_0,s_1,s_2,s_3,...,s_n]$. So we want to find a set $C$ so that $s_{d+1} = s_0 \cdot c_d + s_1 \cdot c_{d-1} + ... + s_d \cdot c_0$. 
 
 Therefore we can define:
-$s_i = \sum_{j=1}^d{c_j \cdot s_{i-j}}$ &emsp; $ \forall i \geq d $
+$s_i = \sum_{j=1}^d{c_j \cdot s_{i-j}}$ &emsp; $\forall i \geq d$
 
 #### Examples
 Here is reported a list of examples, fell free to add your personal ones to help gaining a better understanding of the problem.
