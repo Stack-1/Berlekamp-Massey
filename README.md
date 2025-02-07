@@ -17,19 +17,23 @@ The algorithm has multiple steps and has been proven to work in different papers
 Our reference problem is to find the coefficients $C = [c_1,c_1.c_2,c_3,...,c_d]$ that correctly finds a linear recurrence between the elements of the  sequence $S = [s_0,s_1,s_2,s_3,...,s_n]$. So we want to find a set $C$ so that $s_{d+1} = s_0 \cdot c_d + s_1 \cdot c_{d-1} + ... + s_d \cdot c_0$. 
 
 Therefore we can define:
-$s_i = \sum_{j=1}^d{c_j \cdot s_{i-j}}$ &emsp;$\forall i \geq d$
+$s_i = \sum_{j=1}^d{c_j \cdot s_{i-j}}$ &emsp; $ \forall i \geq d $
 
 #### Examples
 Here is reported a list of examples, fell free to add your personal ones to help gaining a better understanding of the problem.
 ##### Fibonacci
 A typical example of a linear recurrence is Fibonacci, $F_n = F_{n-1} + F_{n-2}$
-$$
-\begin{cases} 
+
+```math
+
+\begin{cases}
 s_i = s_{i-1} + s_{i-2} \\
 s_0 = 1 \\
 s_1 = 1
 \end{cases}
-$$
+
+```
+
 In this example $S = [1,1,2,3,5,8,13,21,...]$ and $C = [1,1]$ 
 ##### Growing sequence
 
@@ -56,7 +60,7 @@ If a file name is specified make sure to place a file with the same name in the 
 In the configuration directory are present test_*.txt files used to test the correctness of the implementation. Those test were written according to the examples present in \[\[1\]\](#trivialize).
 
 ## References
-<a id="trivialize">\[1\].</a> Trivialize Berlekamp-Massey : https://mzhang2021.github.io/cp-blog/berlekamp-massey/
+<a id="trivialize">\[1\].</a> Trivialize Berlekamp-Massey, https://mzhang2021.github.io/cp-blog/berlekamp-massey/
 
 <a id="2">\[2\].</a> MASSEY, James. Shift-register synthesis and BCH decoding. IEEE transactions on Information Theory, 1969, 15.1: 122-127. 
 
